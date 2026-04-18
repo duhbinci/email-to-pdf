@@ -6,7 +6,10 @@ from datetime import datetime, timezone
 import pytest
 
 from email_to_pdf.domain.models import Address, Attachment, ParsedEmail
-from email_to_pdf.domain.services.html_normaliser import HtmlNormaliser, _TRANSPARENT_PNG
+from email_to_pdf.domain.services.html_normaliser import (
+    _TRANSPARENT_PNG,
+    HtmlNormaliser,
+)
 from email_to_pdf.infra.config import RenderSettings
 
 _SETTINGS = RenderSettings()
@@ -54,7 +57,9 @@ def normaliser() -> HtmlNormaliser:
 
 
 class TestCidResolution:
-    def test_cid_reference_resolved_to_data_uri(self, normaliser: HtmlNormaliser) -> None:
+    def test_cid_reference_resolved_to_data_uri(
+        self, normaliser: HtmlNormaliser
+    ) -> None:
         img_data = b"fake_image_data"
         att = make_attachment(content_id="img001@example.com", data=img_data)
         email = make_email(
@@ -80,7 +85,9 @@ class TestCidResolution:
         assert "cid:" not in result
         assert "data:image/png;base64," in result
 
-    def test_missing_cid_replaced_with_transparent_placeholder(self, normaliser: HtmlNormaliser) -> None:
+    def test_missing_cid_replaced_with_transparent_placeholder(
+        self, normaliser: HtmlNormaliser
+    ) -> None:
         email = make_email(
             html_body='<img src="cid:missing@example.com">',
             attachments=[],
@@ -97,7 +104,9 @@ class TestCidResolution:
         )
         warnings: list[str] = []
         normaliser.build(email, _SETTINGS, warnings)
-        assert any("missing" in w.lower() or "unresolved" in w.lower() for w in warnings)
+        assert any(
+            "missing" in w.lower() or "unresolved" in w.lower() for w in warnings
+        )
 
     def test_multiple_cid_references_resolved(self, normaliser: HtmlNormaliser) -> None:
         att1 = make_attachment(content_id="img1@example.com", data=b"data1")
@@ -127,8 +136,12 @@ class TestRemoteUrlReplacement:
         assert "https://example.com/logo.png" not in result
         assert _TRANSPARENT_PNG in result
 
-    def test_remote_url_replacement_produces_warning(self, normaliser: HtmlNormaliser) -> None:
-        email = make_email(html_body='<img src="https://tracker.example.com/pixel.png">')
+    def test_remote_url_replacement_produces_warning(
+        self, normaliser: HtmlNormaliser
+    ) -> None:
+        email = make_email(
+            html_body='<img src="https://tracker.example.com/pixel.png">'
+        )
         warnings: list[str] = []
         normaliser.build(email, _SETTINGS, warnings)
         assert len(warnings) > 0
@@ -155,7 +168,9 @@ class TestPlainTextConversion:
         result = normaliser.build(email, _SETTINGS, warnings)
         assert "<br>" in result
 
-    def test_html_special_chars_escaped_in_text(self, normaliser: HtmlNormaliser) -> None:
+    def test_html_special_chars_escaped_in_text(
+        self, normaliser: HtmlNormaliser
+    ) -> None:
         email = make_email(html_body=None, text_body="<script>alert(1)</script>")
         warnings: list[str] = []
         result = normaliser.build(email, _SETTINGS, warnings)
@@ -200,15 +215,11 @@ class TestPrintCssInjection:
 
 class TestRtlPreservation:
     def test_rtl_dir_attribute_preserved(self, normaliser: HtmlNormaliser) -> None:
-        email = make_email(
-            html_body='<html dir="rtl"><body><p>مرحبا</p></body></html>'
-        )
+        email = make_email(html_body='<html dir="rtl"><body><p>مرحبا</p></body></html>')
         result = normaliser.build(email, _SETTINGS)
         assert 'dir="rtl"' in result
 
     def test_lang_attribute_preserved(self, normaliser: HtmlNormaliser) -> None:
-        email = make_email(
-            html_body='<html lang="ar"><body><p>مرحبا</p></body></html>'
-        )
+        email = make_email(html_body='<html lang="ar"><body><p>مرحبا</p></body></html>')
         result = normaliser.build(email, _SETTINGS)
         assert 'lang="ar"' in result

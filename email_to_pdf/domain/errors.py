@@ -32,7 +32,13 @@ class UnsupportedFormatError(InputError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="format_detection", retryable=False, cause=cause)
+        super().__init__(
+            message,
+            job_id=job_id,
+            stage="format_detection",
+            retryable=False,
+            cause=cause,
+        )
 
 
 class InputReadError(InputError):
@@ -43,7 +49,9 @@ class InputReadError(InputError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="input_read", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="input_read", retryable=False, cause=cause
+        )
 
 
 class ParseError(EmailToPdfError):
@@ -58,7 +66,9 @@ class EmlParseError(ParseError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="eml_parse", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="eml_parse", retryable=False, cause=cause
+        )
 
 
 class MsgParseError(ParseError):
@@ -69,7 +79,9 @@ class MsgParseError(ParseError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="msg_parse", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="msg_parse", retryable=False, cause=cause
+        )
 
 
 class NormalisationError(EmailToPdfError):
@@ -80,7 +92,9 @@ class NormalisationError(EmailToPdfError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="normalisation", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="normalisation", retryable=False, cause=cause
+        )
 
 
 class SanitisationError(NormalisationError):
@@ -107,7 +121,9 @@ class RenderTimeoutError(RenderError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="render", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="render", retryable=False, cause=cause
+        )
 
 
 class BrowserCrashError(RenderError):
@@ -118,7 +134,9 @@ class BrowserCrashError(RenderError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="render", retryable=True, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="render", retryable=True, cause=cause
+        )
 
 
 class StorageError(EmailToPdfError):
@@ -133,7 +151,9 @@ class WritePermissionError(StorageError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="storage", retryable=True, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="storage", retryable=True, cause=cause
+        )
 
 
 class PathTraversalError(StorageError):
@@ -144,7 +164,9 @@ class PathTraversalError(StorageError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="storage", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="storage", retryable=False, cause=cause
+        )
 
 
 class ConfigurationError(EmailToPdfError):
@@ -155,4 +177,6 @@ class ConfigurationError(EmailToPdfError):
         job_id: str | None = None,
         cause: Exception | None = None,
     ) -> None:
-        super().__init__(message, job_id=job_id, stage="configuration", retryable=False, cause=cause)
+        super().__init__(
+            message, job_id=job_id, stage="configuration", retryable=False, cause=cause
+        )

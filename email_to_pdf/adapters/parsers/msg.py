@@ -25,6 +25,7 @@ class MsgParserAdapter:
             ) from exc
 
         import io
+
         warnings: list[str] = []
 
         try:
@@ -130,9 +131,14 @@ class MsgParserAdapter:
         if not value:
             return []
         addrs = email.utils.getaddresses([value])
-        return [Address(display_name=name or "", addr_spec=addr or "") for name, addr in addrs]
+        return [
+            Address(display_name=name or "", addr_spec=addr or "")
+            for name, addr in addrs
+        ]
 
-    def _extract_attachments(self, msg: object, warnings: list[str]) -> list[Attachment]:
+    def _extract_attachments(
+        self, msg: object, warnings: list[str]
+    ) -> list[Attachment]:
         attachments: list[Attachment] = []
         try:
             raw_attachments = getattr(msg, "attachments", []) or []
@@ -142,7 +148,9 @@ class MsgParserAdapter:
                     if data is None:
                         long_filename = getattr(att, "longFilename", None)
                         short_filename = getattr(att, "shortFilename", None)
-                        warnings.append(f"MSG attachment {long_filename or short_filename!r} has no data; skipping")
+                        warnings.append(
+                            f"MSG attachment {long_filename or short_filename!r} has no data; skipping"
+                        )
                         continue
 
                     if isinstance(data, str):
@@ -156,7 +164,9 @@ class MsgParserAdapter:
                     if not filename:
                         filename = "unnamed"
 
-                    content_type = getattr(att, "mimetype", None) or "application/octet-stream"
+                    content_type = (
+                        getattr(att, "mimetype", None) or "application/octet-stream"
+                    )
                     content_id = getattr(att, "contentId", None)
                     if content_id:
                         content_id = content_id.strip("<>")

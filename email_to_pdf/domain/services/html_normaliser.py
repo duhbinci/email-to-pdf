@@ -95,9 +95,11 @@ class HtmlNormaliser:
             if att:
                 if att.size <= 10 * 1024 * 1024:
                     data_uri = self._attachment_to_data_uri(att)
-                    return f"src=\"{data_uri}\""
+                    return f'src="{data_uri}"'
                 else:
-                    warnings.append(f"Attachment CID {cid!r} exceeds embed size limit; using placeholder")
+                    warnings.append(
+                        f"Attachment CID {cid!r} exceeds embed size limit; using placeholder"
+                    )
                     return f'src="{_TRANSPARENT_PNG}"'
             warnings.append(f"Unresolved CID reference: {cid!r}; using placeholder")
             return f'src="{_TRANSPARENT_PNG}"'
@@ -129,7 +131,12 @@ class HtmlNormaliser:
                 return f'src="{_TRANSPARENT_PNG}"'
             return match.group(0)
 
-        return re.sub(r'src=["\']?(https?://[^"\'>\s]+)["\']?', replace_src, html, flags=re.IGNORECASE)
+        return re.sub(
+            r'src=["\']?(https?://[^"\'>\s]+)["\']?',
+            replace_src,
+            html,
+            flags=re.IGNORECASE,
+        )
 
     def _attachment_to_data_uri(self, att: Attachment) -> str:
         encoded = base64.b64encode(att.data).decode("ascii")
@@ -140,10 +147,14 @@ class HtmlNormaliser:
         lines = escaped.split("\n")
         return "<br>\n".join(lines)
 
-    def _truncate_if_needed(self, html: str, warnings: list[str], max_bytes: int = 20 * 1024 * 1024) -> str:
+    def _truncate_if_needed(
+        self, html: str, warnings: list[str], max_bytes: int = 20 * 1024 * 1024
+    ) -> str:
         encoded = html.encode("utf-8")
         if len(encoded) > max_bytes:
-            warnings.append(f"HTML body truncated from {len(encoded)} to {max_bytes} bytes")
+            warnings.append(
+                f"HTML body truncated from {len(encoded)} to {max_bytes} bytes"
+            )
             truncated = encoded[:max_bytes].decode("utf-8", errors="replace")
             return truncated + "\n<p>[truncated]</p>"
         return html

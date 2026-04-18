@@ -57,7 +57,9 @@ class EmlParserAdapter:
         warnings: list[str],
     ) -> tuple[str | None, str | None, list[Attachment]]:
         if depth > _MAX_DEPTH:
-            warnings.append(f"MIME depth cap reached at {_MAX_DEPTH}; skipping deeper parts")
+            warnings.append(
+                f"MIME depth cap reached at {_MAX_DEPTH}; skipping deeper parts"
+            )
             return None, None, []
 
         content_type = msg.get_content_type().lower()
@@ -88,7 +90,9 @@ class EmlParserAdapter:
             return None, text, []
 
         if content_type.startswith("image/") or content_type.startswith("application/"):
-            att = self._make_attachment(msg, is_inline=("inline" in disposition or bool(msg.get("Content-ID"))))
+            att = self._make_attachment(
+                msg, is_inline=("inline" in disposition or bool(msg.get("Content-ID")))
+            )
             return None, None, [att] if att else []
 
         return None, None, []
@@ -137,7 +141,9 @@ class EmlParserAdapter:
 
         return html_body, text_body, attachments
 
-    def _decode_part(self, msg: email.message.Message, warnings: list[str]) -> str | None:
+    def _decode_part(
+        self, msg: email.message.Message, warnings: list[str]
+    ) -> str | None:
         raw = msg.get_payload(decode=True)
         if not isinstance(raw, bytes):
             return None
@@ -150,14 +156,14 @@ class EmlParserAdapter:
         for cs in [charset, "utf-8"]:
             try:
                 return data.decode(cs)
-            except (UnicodeDecodeError, LookupError):
+            except UnicodeDecodeError, LookupError:
                 pass
 
         detected = chardet.detect(data)
         if detected.get("encoding"):
             try:
                 return data.decode(detected["encoding"])
-            except (UnicodeDecodeError, LookupError):
+            except UnicodeDecodeError, LookupError:
                 pass
 
         return data.decode("latin-1", errors="replace")
@@ -200,7 +206,7 @@ class EmlParserAdapter:
                     cs = charset or "utf-8"
                     try:
                         decoded_parts.append(part.decode(cs))
-                    except (UnicodeDecodeError, LookupError):
+                    except UnicodeDecodeError, LookupError:
                         decoded_parts.append(part.decode("latin-1", errors="replace"))
                 else:
                     decoded_parts.append(part)

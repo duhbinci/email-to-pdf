@@ -14,7 +14,9 @@ app = typer.Typer(name="email-to-pdf", help="Convert EML/MSG email files to PDF.
 
 @app.command()
 def convert(
-    input_path: Annotated[Path, typer.Argument(help="Path to the input .eml or .msg file")],
+    input_path: Annotated[
+        Path, typer.Argument(help="Path to the input .eml or .msg file")
+    ],
     output: Annotated[
         Optional[Path],
         typer.Option("--output", "-o", help="Output PDF path (default: <input>.pdf)"),
@@ -25,7 +27,9 @@ def convert(
     ] = "A4",
     extract_attachments: Annotated[
         Optional[Path],
-        typer.Option("--extract-attachments", help="Directory to extract attachments into"),
+        typer.Option(
+            "--extract-attachments", help="Directory to extract attachments into"
+        ),
     ] = None,
 ) -> None:
     if not input_path.exists():
@@ -33,7 +37,10 @@ def convert(
         raise typer.Exit(1)
 
     if format not in ("A4", "Letter", "Legal", "A3"):
-        typer.echo(f"Error: Invalid format {format!r}. Must be one of: A4, Letter, Legal, A3", err=True)
+        typer.echo(
+            f"Error: Invalid format {format!r}. Must be one of: A4, Letter, Legal, A3",
+            err=True,
+        )
         raise typer.Exit(1)
 
     if output is None:
@@ -70,7 +77,9 @@ def convert(
                 for w in result.warnings:
                     typer.echo(f"    - {w}", err=True)
             if result.extracted_attachments:
-                typer.echo(f"  Attachments extracted: {len(result.extracted_attachments)}")
+                typer.echo(
+                    f"  Attachments extracted: {len(result.extracted_attachments)}"
+                )
                 for path in result.extracted_attachments:
                     typer.echo(f"    {path}")
         except Exception as exc:

@@ -3,9 +3,11 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import hashlib
-import pathlib
+import os
 import time
 from typing import TYPE_CHECKING
+
+import anyio
 
 from email_to_pdf.domain.errors import (
     BrowserCrashError,
@@ -20,7 +22,12 @@ from email_to_pdf.infra.config import Settings
 from email_to_pdf.infra.logging import get_logger
 
 if TYPE_CHECKING:
-    from email_to_pdf.ports import EmailParserPort, HtmlRendererPort, SanitizerPort, StoragePort
+    from email_to_pdf.ports import (
+        EmailParserPort,
+        HtmlRendererPort,
+        SanitizerPort,
+        StoragePort,
+    )
 
 logger = get_logger(__name__)
 
@@ -68,7 +75,9 @@ class ConversionService:
         except ParseError:
             raise
         except Exception as exc:
-            raise EmlParseError(f"Parse failed: {exc}", job_id=job_id, cause=exc) from exc
+            raise EmlParseError(
+                f"Parse failed: {exc}", job_id=job_id, cause=exc
+            ) from exc
         durations["parse"] = (time.monotonic() - t0) * 1000
         log.info("parse_complete", format=parsed.input_format)
 
@@ -98,17 +107,26 @@ class ConversionService:
 
         t0 = time.monotonic()
         try:
-            pdf_bytes = await self._renderer.render(normalised_html, self._settings.render)
+            pdf_bytes = await self._renderer.render(
+                normalised_html, self._settings.render
+            )
         except RenderError:
             raise
         except Exception as exc:
-            raise BrowserCrashError(f"Render failed: {exc}", job_id=job_id, cause=exc) from exc
+            raise BrowserCrashError(
+                f"Render failed: {exc}", job_id=job_id, cause=exc
+            ) from exc
         durations["render"] = (time.monotonic() - t0) * 1000
         log.info("render_complete", pdf_size=len(pdf_bytes))
 
         t0 = time.monotonic()
-        if self._settings.attachments.extract and self._settings.attachments.extract_directory:
-            extracted_attachments = await self._extract_attachments(parsed, job_id, warnings)
+        if (
+            self._settings.attachments.extract
+            and self._settings.attachments.extract_directory
+        ):
+            extracted_attachments = await self._extract_attachments(
+                parsed, job_id, warnings
+            )
         if output_key and self._storage:
             await self._storage.write(output_key, pdf_bytes)
         durations["output"] = (time.monotonic() - t0) * 1000
@@ -128,11 +146,14 @@ class ConversionService:
         log.info("conversion_complete", page_count=page_count, warnings=len(warnings))
         return result
 
-    def _select_parser(self, data: bytes, job_id: str | None = None) -> "EmailParserPort":
+    def _select_parser(
+        self, data: bytes, job_id: str | None = None
+    ) -> "EmailParserPort":
         for parser in self._parsers:
             if parser.can_parse(data):
                 return parser
         from email_to_pdf.domain.errors import UnsupportedFormatError
+
         raise UnsupportedFormatError(job_id=job_id)
 
     async def _extract_attachments(
@@ -154,18 +175,22 @@ class ConversionService:
 
         for i, att in enumerate(parsed.attachments):
             if i >= self._settings.attachments.max_count:
-                warnings.append(f"Attachment count exceeded max ({self._settings.attachments.max_count}); skipping remaining")
+                warnings.append(
+                    f"Attachment count exceeded max ({self._settings.attachments.max_count}); skipping remaining"
+                )
                 break
             if att.is_inline:
                 continue
             try:
                 safe_name = sanitizer.sanitise(att.filename or "unnamed", used_names)
-                dest = pathlib.Path(extract_dir) / safe_name
-                dest = dest.resolve()
-                if not str(dest).startswith(str(pathlib.Path(extract_dir).resolve())):
-                    warnings.append(f"Path traversal blocked for attachment: {att.filename!r}")
+                base = await anyio.Path(extract_dir).resolve()
+                dest = await (base / safe_name).resolve()
+                if not str(dest).startswith(str(base) + os.sep):
+                    warnings.append(
+                        f"Path traversal blocked for attachment: {att.filename!r}"
+                    )
                     continue
-                await asyncio.to_thread(dest.write_bytes, att.data)
+                await dest.write_bytes(att.data)
                 extracted.append(str(dest))
             except Exception as exc:
                 warnings.append(f"Failed to extract attachment {att.filename!r}: {exc}")

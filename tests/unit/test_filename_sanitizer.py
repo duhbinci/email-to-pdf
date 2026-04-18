@@ -24,16 +24,22 @@ class TestWindowsReservedNames:
         assert sanitizer.sanitise("NUL") != "NUL"
 
     @pytest.mark.parametrize("name", [f"COM{i}" for i in range(1, 10)])
-    def test_com_devices_are_sanitised(self, sanitizer: FileNameSanitizer, name: str) -> None:
+    def test_com_devices_are_sanitised(
+        self, sanitizer: FileNameSanitizer, name: str
+    ) -> None:
         result = sanitizer.sanitise(name)
         assert result.upper() != name.upper()
 
     @pytest.mark.parametrize("name", [f"LPT{i}" for i in range(1, 10)])
-    def test_lpt_devices_are_sanitised(self, sanitizer: FileNameSanitizer, name: str) -> None:
+    def test_lpt_devices_are_sanitised(
+        self, sanitizer: FileNameSanitizer, name: str
+    ) -> None:
         result = sanitizer.sanitise(name)
         assert result.upper() != name.upper()
 
-    def test_reserved_name_with_extension_is_sanitised(self, sanitizer: FileNameSanitizer) -> None:
+    def test_reserved_name_with_extension_is_sanitised(
+        self, sanitizer: FileNameSanitizer
+    ) -> None:
         result = sanitizer.sanitise("CON.txt")
         assert "CON" not in result.upper().split(".")[0]
 
@@ -42,16 +48,18 @@ class TestWindowsReservedNames:
 
 
 class TestIllegalCharacters:
-    @pytest.mark.parametrize("char", ['/', '\\', ':', '*', '?', '"', '<', '>', '|'])
-    def test_illegal_char_replaced_with_underscore(self, sanitizer: FileNameSanitizer, char: str) -> None:
+    @pytest.mark.parametrize("char", ["/", "\\", ":", "*", "?", '"', "<", ">", "|"])
+    def test_illegal_char_replaced_with_underscore(
+        self, sanitizer: FileNameSanitizer, char: str
+    ) -> None:
         result = sanitizer.sanitise(f"file{char}name.txt")
         assert char not in result
         assert "_" in result
 
     def test_multiple_illegal_chars(self, sanitizer: FileNameSanitizer) -> None:
-        result = sanitizer.sanitise('file:name?here.txt')
-        assert ':' not in result
-        assert '?' not in result
+        result = sanitizer.sanitise("file:name?here.txt")
+        assert ":" not in result
+        assert "?" not in result
 
     def test_legal_chars_preserved(self, sanitizer: FileNameSanitizer) -> None:
         result = sanitizer.sanitise("my-file_name (1).txt")
@@ -96,7 +104,9 @@ class TestDeduplication:
         result = sanitizer.sanitise("file.txt", used_names=used)
         assert result == "file.txt"
 
-    def test_used_names_updated_after_sanitise(self, sanitizer: FileNameSanitizer) -> None:
+    def test_used_names_updated_after_sanitise(
+        self, sanitizer: FileNameSanitizer
+    ) -> None:
         used: set[str] = set()
         sanitizer.sanitise("file.txt", used_names=used)
         assert "file.txt" in used
@@ -113,7 +123,9 @@ class TestEmptyName:
     def test_empty_string_becomes_unnamed(self, sanitizer: FileNameSanitizer) -> None:
         assert sanitizer.sanitise("") == "unnamed"
 
-    def test_whitespace_only_becomes_unnamed(self, sanitizer: FileNameSanitizer) -> None:
+    def test_whitespace_only_becomes_unnamed(
+        self, sanitizer: FileNameSanitizer
+    ) -> None:
         assert sanitizer.sanitise("   ") == "unnamed"
 
     def test_dots_only_becomes_unnamed(self, sanitizer: FileNameSanitizer) -> None:

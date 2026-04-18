@@ -4,7 +4,12 @@ import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from email_to_pdf.domain.errors import BrowserCrashError, RenderTimeoutError
 from email_to_pdf.infra.config import BrowserPoolSettings, RenderSettings
@@ -65,7 +70,9 @@ class BrowserPool:
             raise BrowserCrashError("Browser pool has not been started")
 
         async with self._semaphore:
-            context = await self._browser.new_context(java_script_enabled=False, offline=True)
+            context = await self._browser.new_context(
+                java_script_enabled=False, offline=True
+            )
             try:
                 yield context
             finally:
@@ -86,12 +93,14 @@ class PlaywrightRendererAdapter:
         try:
             async with self._pool.acquire() as context:
                 return await self._do_render(context, html, settings)
-        except (RenderTimeoutError, BrowserCrashError):
+        except RenderTimeoutError, BrowserCrashError:
             raise
         except Exception as exc:
             raise BrowserCrashError(f"Render failed: {exc}", cause=exc) from exc
 
-    async def _do_render(self, context: object, html: str, settings: RenderSettings) -> bytes:
+    async def _do_render(
+        self, context: object, html: str, settings: RenderSettings
+    ) -> bytes:
         from playwright.async_api import Error as PlaywrightError
         from playwright.async_api import TimeoutError as PlaywrightTimeout
 
@@ -99,7 +108,11 @@ class PlaywrightRendererAdapter:
 
         async def block_requests(route: object) -> None:
             url = route.request.url  # type: ignore[attr-defined]
-            if url.startswith("data:") or url.startswith("file:") or url.startswith("about:"):
+            if (
+                url.startswith("data:")
+                or url.startswith("file:")
+                or url.startswith("about:")
+            ):
                 await route.continue_()  # type: ignore[attr-defined]
             else:
                 await route.abort()  # type: ignore[attr-defined]
@@ -107,7 +120,9 @@ class PlaywrightRendererAdapter:
         await page.route("**/*", block_requests)
 
         if not settings.allow_scripts:
-            await page.add_init_script("Object.defineProperty(document, 'scripts', {get: function() { return []; }});")
+            await page.add_init_script(
+                "Object.defineProperty(document, 'scripts', {get: function() { return []; }});"
+            )
 
         try:
             await page.set_content(html, wait_until="domcontentloaded")

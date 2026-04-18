@@ -90,7 +90,9 @@ async def _read_input_async(input: str | bytes | BinaryIO) -> bytes:
         try:
             return await asyncio.to_thread(Path(input).read_bytes)
         except OSError as exc:
-            raise InputReadError(f"Cannot read file {input!r}: {exc}", cause=exc) from exc
+            raise InputReadError(
+                f"Cannot read file {input!r}: {exc}", cause=exc
+            ) from exc
     try:
         data = await asyncio.to_thread(input.read)
         if isinstance(data, str):

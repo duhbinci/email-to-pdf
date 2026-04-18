@@ -4,7 +4,9 @@ import re
 
 
 class ContentTypeCleaner:
-    _BOUNDARY_MISSING = re.compile(r'boundary\s*=\s*["\']?\s*["\']?(?:;|$)', re.IGNORECASE)
+    _BOUNDARY_MISSING = re.compile(
+        r'boundary\s*=\s*["\']?\s*["\']?(?:;|$)', re.IGNORECASE
+    )
     _BOUNDARY_RE = re.compile(r'boundary\s*=\s*["\']?([^;"\']+)["\']?', re.IGNORECASE)
     _CHARSET_RE = re.compile(r'charset\s*=\s*["\']?([^;"\']+)["\']?', re.IGNORECASE)
 
@@ -26,7 +28,9 @@ class ContentTypeCleaner:
         if charset_match:
             charset = charset_match.group(1).strip().strip('"').strip("'")
             if charset:
-                content_type = self._CHARSET_RE.sub(f'charset="{charset}"', content_type)
+                content_type = self._CHARSET_RE.sub(
+                    f'charset="{charset}"', content_type
+                )
 
         return content_type
 
@@ -36,7 +40,9 @@ class ContentTypeCleaner:
         for line in raw_body[:2048].split(b"\n"):
             stripped = line.strip()
             if stripped.startswith(b"--") and len(stripped) > 2:
-                boundary = stripped[2:].rstrip(b"-").decode("ascii", errors="replace").strip()
+                boundary = (
+                    stripped[2:].rstrip(b"-").decode("ascii", errors="replace").strip()
+                )
                 if boundary:
                     return boundary
         return None

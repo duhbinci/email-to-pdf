@@ -1,3 +1,10 @@
 .venv/
 *.pyc
 test_main.http
+.idea/
+node_modules/
+# Added by code-review-graph
+.code-review-graph/
+CLAUDE.md
+.claude
+.mcp.json

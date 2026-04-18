@@ -35,13 +35,9 @@ class LocalFsStorageAdapter:
         try:
             return await asyncio.to_thread(dest.read_bytes)
         except PermissionError as exc:
-            raise WritePermissionError(
-                f"Cannot read {dest}: {exc}", cause=exc
-            ) from exc
+            raise WritePermissionError(f"Cannot read {dest}: {exc}", cause=exc) from exc
         except FileNotFoundError as exc:
-            raise WritePermissionError(
-                f"File not found: {dest}", cause=exc
-            ) from exc
+            raise WritePermissionError(f"File not found: {dest}", cause=exc) from exc
 
     def _resolve_safe(self, key: str) -> Path:
         clean_key = key.lstrip("/").lstrip("\\")

@@ -8,8 +8,7 @@ from email_to_pdf.domain.models import Address, ParsedEmail
 
 class HeaderRenderer:
     def render(self, email: ParsedEmail) -> str:
-        rows: list[str] = []
-        rows.append(self._row("From", self._fmt_address(email.from_)))
+        rows: list[str] = [self._row("From", self._fmt_address(email.from_))]
 
         if email.to:
             rows.append(self._row("To", self._fmt_addresses(email.to)))

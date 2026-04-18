@@ -342,23 +342,19 @@ wheels = [
 [[package]]
 name = "email-to-pdf"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "anyio" },
     { name = "beautifulsoup4" },
     { name = "chardet" },
-    { name = "code-review-graph" },
     { name = "extract-msg" },
-    { name = "fastapi" },
     { name = "lxml" },
     { name = "nh3" },
     { name = "playwright" },
     { name = "pydantic" },
-    { name = "python-multipart" },
     { name = "structlog" },
     { name = "tenacity" },
     { name = "typer" },
-    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
@@ -367,29 +363,33 @@ dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
+server = [
+    { name = "fastapi" },
+    { name = "python-multipart" },
+    { name = "uvicorn" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "anyio", specifier = ">=4.0" },
     { name = "beautifulsoup4", specifier = ">=4.12" },
     { name = "chardet", specifier = ">=5.0" },
-    { name = "code-review-graph", specifier = ">=2.3.2" },
     { name = "code-review-graph", marker = "extra == 'dev'" },
     { name = "extract-msg", specifier = ">=0.48" },
-    { name = "fastapi", specifier = ">=0.136.0" },
+    { name = "fastapi", marker = "extra == 'server'", specifier = ">=0.136.0" },
     { name = "lxml", specifier = ">=5.0" },
     { name = "nh3", specifier = ">=0.2" },
     { name = "playwright", specifier = ">=1.58.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.24" },
-    { name = "python-multipart", specifier = ">=0.0.26" },
+    { name = "python-multipart", marker = "extra == 'server'", specifier = ">=0.0.26" },
     { name = "structlog", specifier = ">=24.0" },
     { name = "tenacity", specifier = ">=8.0" },
     { name = "typer", specifier = ">=0.12" },
-    { name = "uvicorn", specifier = ">=0.44.0" },
+    { name = "uvicorn", marker = "extra == 'server'", specifier = ">=0.44.0" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["server", "dev"]
 
 [[package]]
 name = "email-validator"

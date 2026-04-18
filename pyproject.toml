@@ -1,12 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "email-to-pdf"
 version = "0.1.0"
+description = "Convert .eml and .msg email files to PDF"
 requires-python = ">=3.14"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["email", "pdf", "eml", "msg", "converter"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Communications :: Email",
+    "Topic :: Multimedia",
+]
 dependencies = [
     "anyio>=4.0",
-    "fastapi>=0.136.0",
     "playwright>=1.58.0",
-    "uvicorn>=0.44.0",
     "extract-msg>=0.48",
     "nh3>=0.2",
     "beautifulsoup4>=4.12",
@@ -16,11 +31,14 @@ dependencies = [
     "pydantic>=2.0",
     "tenacity>=8.0",
     "typer>=0.12",
-    "python-multipart>=0.0.26",
-    "code-review-graph>=2.3.2",
 ]
 
 [project.optional-dependencies]
+server = [
+    "fastapi>=0.136.0",
+    "uvicorn>=0.44.0",
+    "python-multipart>=0.0.26",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
@@ -29,6 +47,14 @@ dev = [
 
 [project.scripts]
 email-to-pdf = "email_to_pdf.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/kshitizwagle/email-to-pdf"
+Repository = "https://github.com/kshitizwagle/email-to-pdf"
+Issues = "https://github.com/kshitizwagle/email-to-pdf/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["email_to_pdf"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

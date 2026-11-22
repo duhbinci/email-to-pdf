@@ -49,9 +49,9 @@ dev = [
 email-to-pdf = "email_to_pdf.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/kshitizwagle/email-to-pdf"
-Repository = "https://github.com/kshitizwagle/email-to-pdf"
-Issues = "https://github.com/kshitizwagle/email-to-pdf/issues"
+Homepage = "https://github.com/duhbinci/email-to-pdf"
+Repository = "https://github.com/duhbinci/email-to-pdf"
+Issues = "https://github.com/duhbinci/email-to-pdf/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["email_to_pdf"]

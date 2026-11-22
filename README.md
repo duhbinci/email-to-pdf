@@ -13,7 +13,7 @@ Convert `.eml` and `.msg` email files to PDF — via CLI, HTTP API, or Python li
 ## Installation
 
 ```bash
-pip install git+https://github.com/kshitizwagle/email-to-pdf.git
+pip install git+https://github.com/duhbinci/email-to-pdf.git
 ```
 
 After installing, download the Chromium browser that Playwright uses for rendering:
@@ -25,7 +25,7 @@ playwright install chromium --with-deps
 To also install the web server components:
 
 ```bash
-pip install "git+https://github.com/kshitizwagle/email-to-pdf.git#egg=email-to-pdf[server]"
+pip install "git+https://github.com/duhbinci/email-to-pdf.git#egg=email-to-pdf[server]"
 ```
 
 ## Requirements
@@ -111,7 +111,7 @@ The service is available at `http://localhost:8000`.
 ## Development
 
 ```bash
-git clone https://github.com/kshitizwagle/email-to-pdf.git
+git clone https://github.com/duhbinci/email-to-pdf.git
 cd email-to-pdf
 uv sync --dev
 uv run playwright install chromium --with-deps
